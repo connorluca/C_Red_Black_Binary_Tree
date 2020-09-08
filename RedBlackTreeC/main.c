@@ -26,6 +26,7 @@ int main(int argc, char** argv) {
     for(int i = 0; i < 50; i++){
         
     }
+    return 0;
 }
 //return pointers to memory locations and forcible allocate memory as otherwise it would fall out of scope and be lost
 struct Node * newNode(int data){
