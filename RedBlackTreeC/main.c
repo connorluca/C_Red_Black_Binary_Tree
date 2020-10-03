@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 //return pointers to memory locations and forcible allocate memory as otherwise it would fall out of scope and be lost
 
 struct Node * newNode(int data) {
-    struct Node node = (struct Node) malloc(sizeof (struct Node)); //allocate memory and cast to the node struct type
+    struct Node node; //allocate memory and cast to the node struct type
     node.data = data;
     node.lChild = NULL;
     node.rChild = NULL;
@@ -72,6 +72,54 @@ void addNode(struct Node root, struct Node newNode1) {
 
     }
 
+}
+/*
+ * Data indicates the value inside the node in which you wish to delete, found same with binary search tree
+ */
+void deleteNode(Node root,int data){
+    struct Node nodeToDelete = findNode(data);
+    if(nodeToDelete==NULL){
+        return -1;//error not found
+    }
+    struct Node *tempNode = root.rChild;
+    while(1==1){
+    if(tempNode.lChild!=NULL){
+        tempNode= tempNode->lChild;
+    }
+    else{
+        break;
+    }
+    }
+    swap(*tempNode->data, &nodeToDelete.data);
+    //tempNode is the location of the node with the data that we are going to delete
+    if(tempNode->rChild==NULL){
+        //just delete the node it has no children
+        tempNode->parent->lChild==NULL;
+        tempNode->parent=NULL;
+    }
+    else if(tempNode->color==1){
+        //just replace the node with its rchild it doesn't effect the balance or double reds
+        tempNode->parent->lChild=tempNode->rChild;
+        tempNode->rChild->parent=tempNode->parent;
+        tempNode=NULL;
+    }
+    else if(tempNode->color==0){
+        //nest if statements here
+    }
+    
+    
+}
+struct Node findNode(Node root,int data){
+    struct Node tempNode = root;
+    while(tempNode!=NULL &&tempNode.data!=data){
+        if(tempNode.data > data){
+            tempNode = tempNode.lChild;
+        }
+        else{
+            tempNode = tempNode.rChild;
+        }
+    }
+    return tempNode;
 }
 
 void fixAfterInsert(struct Node root) {
