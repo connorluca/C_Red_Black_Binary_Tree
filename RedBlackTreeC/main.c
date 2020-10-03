@@ -29,7 +29,7 @@ int main(int argc, char** argv) {
     //fill tree with 50 random values
     for (int i = 0; i < 50; i++) {
         addNode(root, newNode(srand() % 10000));
-        
+
     }
     //we'll use some recursion to print out the tree 
     return 0;
@@ -73,49 +73,60 @@ void addNode(struct Node root, struct Node newNode1) {
     }
 
 }
+
 /*
  * Data indicates the value inside the node in which you wish to delete, found same with binary search tree
  */
-void deleteNode(Node root,int data){
+void deleteNode(Node root, int data) {
     struct Node nodeToDelete = findNode(data);
-    if(nodeToDelete==NULL){
-        return -1;//error not found
+    if (nodeToDelete == NULL) {
+        return -1; //error not found
     }
-    struct Node *tempNode = root.rChild;
-    while(1==1){
-    if(tempNode.lChild!=NULL){
-        tempNode= tempNode->lChild;
-    }
-    else{
-        break;
-    }
-    }
-    swap(*tempNode->data, &nodeToDelete.data);
-    //tempNode is the location of the node with the data that we are going to delete
-    if(tempNode->rChild==NULL){
-        //just delete the node it has no children
-        tempNode->parent->lChild==NULL;
-        tempNode->parent=NULL;
-    }
-    else if(tempNode->color==1){
-        //just replace the node with its rchild it doesn't effect the balance or double reds
-        tempNode->parent->lChild=tempNode->rChild;
-        tempNode->rChild->parent=tempNode->parent;
-        tempNode=NULL;
-    }
-    else if(tempNode->color==0){
-        //nest if statements here
-    }
-    
-    
-}
-struct Node findNode(Node root,int data){
-    struct Node tempNode = root;
-    while(tempNode!=NULL &&tempNode.data!=data){
-        if(tempNode.data > data){
+    struct Node tempNode = root.rChild;
+    while (1 == 1) {
+        if (tempNode.lChild != NULL) {
             tempNode = tempNode.lChild;
+        } else {
+            break;
         }
-        else{
+    }
+    nodeToDelete.data = tempNode.data; //just copy tempNodes data don't worry
+    //about what we overright as that is the data we are deleting anyway
+    if (tempNode.rChild != NULL) {
+
+        int colorOfChild = tempNode.rChild->color;
+        tempNode.rChild->parent = NULL;
+        tempNode.data = tempNode.rChild->data;
+        swap(tempNode.rChild, tempNode.rChild->rChild);
+        swap(tempNode.lChild, tempNode.rChild->lChild);
+        //Node is now deleted tree must be checked for balance issues that may have been created.
+        if (tempNode.color == 1) {
+            tempNode.color = colorOfChild;
+        } else {//double black case
+            if (colorOfChild == 0) {//if it's red we don't have to do anything as it's supposed to be recolored black
+                //but as we never swaped the color values it is already black
+                if (tempNode.parent->rChild->color == 0) {
+
+                } else {
+
+                }
+
+            }
+        }
+
+    } else {
+        //just delete the node no other steps needed
+        swap(&tempNode.lChild, &tempNode.parent);
+        tempNode.parent = NULL;
+    }
+}
+
+struct Node findNode(Node root, int data) {
+    struct Node tempNode = root;
+    while (tempNode != NULL && tempNode.data != data) {
+        if (tempNode.data > data) {
+            tempNode = tempNode.lChild;
+        } else {
             tempNode = tempNode.rChild;
         }
     }
@@ -123,7 +134,7 @@ struct Node findNode(Node root,int data){
 }
 
 void fixAfterInsert(struct Node root) {
-    if(root.parent==NULL){//if this is true we reached the root and the tree has been fixed after insertions
+    if (root.parent == NULL) {//if this is true we reached the root and the tree has been fixed after insertions
         root.color = 0;
         return;
     }
@@ -146,7 +157,7 @@ void fixAfterInsert(struct Node root) {
             } else {
                 root.parent->color = 1;
                 root.color = 0;
-                root.parent->rChild->color=0;
+                root.parent->rChild->color = 0;
                 fixAfterInsert(root.parent);
             }
         } else {
@@ -168,7 +179,7 @@ void fixAfterInsert(struct Node root) {
             } else {
                 root.parent->color = 1;
                 root.color = 0;
-                root.parent->lChild->color=0;
+                root.parent->lChild->color = 0;
                 fixAfterInsert(root.parent);
             }
         }
@@ -177,9 +188,8 @@ void fixAfterInsert(struct Node root) {
 
 }
 
-
 void swap(void *a, void *b) {
-    void *temp = *a;
-    *a = *b;
-    *b = *temp;
+    void *temp = a;
+    a = b;
+    b = temp;
 }
