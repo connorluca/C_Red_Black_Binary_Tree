@@ -5,7 +5,7 @@
 /* 
  * File:   main.c
  * Author: Connor McCrum
- *
+ *https://www.usna.edu/Users/cs/crabbe/SI321/current/red-black/red-black.html - may be helpful for understanding the insertion and deletion algorithms
  *
  */
 
@@ -169,7 +169,7 @@ void addNode(struct Node root, struct Node newNode1) {
         if (root.lChild == NULL) {
             root.lChild = newNode;
             newNode1.parent = root;
-            fixAfterInsert(&root);
+            fixAfterInsert(&newNode1);
         } else {
             addNode(root.lChild, newNode1);
             return;
@@ -178,7 +178,7 @@ void addNode(struct Node root, struct Node newNode1) {
         if (root.rChild == NULL) {
             root.rChild = newNode;
             newNode1.parent = root;
-            fixAfterInsert(&root);
+            fixAfterInsert(&newNode1);
 
         } else {
             addNode(root.rChild, newNode1);
@@ -193,51 +193,74 @@ void fixAfterInsert(struct Node *root) {
         root->color = 0;
         return;
     }
-    if (root->color == 1) {//we have a double red and must rebalance the tree to correct this
-
-
-        if (root == root->parent->lChild) {
-            if (root->parent->rChild == NULL || root->parent->rChild->color == 0) {
-                struct Node tempNode = root->lChild;
-                root->lChild = root->parent;
-                root->parent->lChild = tempNode;
-                if (root->parent->parent != NULL) {
-                    fixAfterInsert(root->parent); //we move up the tree recursively checking for double reds
-                    //once we cannot find any more we check to make sure the tree has a valid black depth
-                } else {
-                    //if the above is false it means that root must now be the root node of the entire tree
-                    root->parent = NULL;
-                    root->color = 0;
-                }
-            } else {
-                root->parent->color = 1;
-                root->color = 0;
-                root->parent->rChild->color = 0;
-                fixAfterInsert(root->parent);
+    if (root->parent->color == 1) {//we have a double red and must rebalance the tree to correct this
+        if(root->parent->parent->rChild == root->parent){
+            if(root->parent->parent->lChild->color==1){//colorflip the nodes.
+                root->parent->color=0;
+                root->parent->parent->color=1;
+                root->parent->parent->lChild->color=0;
+                fixAfterInsert(root->parent->parent);
             }
-        } else {
-            if (root->parent->lChild == NULL || root->parent->lChild->color == 0) {
-                //inverse of above right children are changed instead of left
-                struct Node *tempNode = root->rChild;
-                root->rChild = root->parent;
-                root->parent->rChild = tempNode;
-                if (root->parent->parent != NULL) {
-                    fixAfterInsert(root->parent); //we move up the tree recursively checking for double reds
-                    //once we cannot find any more we check to make sure the tree has a valid black depth
-                } else {
-                    //if the above is false it means that root must now be the root node of the entire tree
-                    root->parent = NULL;
-                    root->color = 0;
+            else{//rotate
+                struct Node *v, *x, *u, *z;
+                v= root->parent;
+                u= root->parent->parent;
+                swap(&u->data, &v->data);
+                if(root==root->parent->lChild){
+                    u->lChild=v;
+                    v->rChild=root;
+                    root->parent=v;
+                    fixAfterInsert(v);
+                    
                 }
-
-
-            } else {
-                root->parent->color = 1;
-                root->color = 0;
-                root->parent->lChild->color = 0;
-                fixAfterInsert(root->parent);
+                else{//root=parent-rchild
+                    x=root->parent->lChild;
+                    z=root->parent->parent->lChild;
+                    
+                    u->lChild=v;
+                    v->lChild=z;
+                    z->parent=v;
+                    u->color=0;
+                    v->color=1;
+                }
+                
             }
         }
+        else{
+            if(root->parent->parent->rChild->color==1){
+                root->parent->color=0;
+                root->parent->parent->color=1;
+                root->parent->parent->rChild->color=0;
+                fixAfterInsert(root->parent->parent);
+            }
+            else{
+                struct Node *v, *x, *u, *z;
+                v= root->parent;
+                u=root->parent->parent;
+                
+                if(root==root->parent->lChild){
+                    swap(&u->data, &v->data);
+                    x=root->parent->rChild;
+                    u->lChild=root;
+                    root->parent=u;
+                    v->lChild=x;
+                    x->parent=v;
+                    v->rChild=z;
+                }
+                else{                 
+                    swap(&root->data, &u->data);
+                    x=root->rChild;
+                    z=root->lChild;
+                    root->rChild=u->rChild;
+                    v->rChild=z;//used to be root but now thats the root of this subtree
+                    u->rChild=root;
+                    root->parent=u;
+                    root->lChild=x;
+                    
+                }
+            }
+        }
+        
     }
 
 
